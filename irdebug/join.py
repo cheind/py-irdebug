@@ -6,7 +6,8 @@ from . import shift
 def join(sigs, intra_pause=0, end_pause=0, shift_signals="never"):
     """Join signals on time axis.
     Time axis needs to be strictly increasing for all signals. 
-    You may want to use shift.toZero() to make all signals zero time based first. 
+    You may want to use shift.toZero() to make all signals zero time based first
+    or set `shift_signals="always"`
     """
 
     r = __shift_signals(sigs[0], shift_signals, 0)
@@ -23,14 +24,15 @@ def join(sigs, intra_pause=0, end_pause=0, shift_signals="never"):
             r = np.concatenate((r, s))
     
     r[-1,0] += end_pause
-    
+
     return r
 
 
 def __shift_signals(s, t="never", index=0):
+    """Helper function to determine shift based on type string."""
     if t == "first" and index == 0:
         return shift.toZero(s)
-    elif t == "all":
+    elif t == "always":
         return shift.toZero(s)
     else:
         return s
