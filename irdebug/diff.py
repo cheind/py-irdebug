@@ -1,5 +1,7 @@
 import numpy as np
 
+from . import util
+
 
 def firstOrder(sigs):
     """Compute the discrete first order forward differential of signal.
@@ -9,10 +11,8 @@ def firstOrder(sigs):
 
     Differential is computed for time axis and state axis.
     """
-    if (isinstance(sigs, list)):
-        return [__firstOrder(s) for s in sigs]
-    else:
-        return __firstOrder(sigs)
-    
-def __firstOrder(sig)
-    return np.diff(sig, axis=0)
+
+    def __firstOrder(sig):
+        return np.diff(sig, axis=0)
+
+    return util.mapSignals(sigs, __firstOrder)
