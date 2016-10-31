@@ -39,35 +39,28 @@ void setup()
   reset();
 }
 
-ISR(TIMER1_COMPA_vect)
-{
-  if (!state)
-  {
+ISR(TIMER1_COMPA_vect) {
+  if (!state) {
     carrier_state = LOW;
     output.write(LOW);
-  }
-  else
-  {
+  } else {
     carrier_state = !carrier_state;
     output.write(carrier_state);
   }
 }
 
-void reset()
-{
+void reset() {
   noInterrupts();
   n = 0;
-  state = LOW;
+  state = ISTATE;
   carrier_state = LOW;
   last_state_changed = 0;
   state_duration = 0;
   interrupts();
 }
 
-void loop()
-{
-  if (n == NEVENTS)
-  {
+void loop() {
+  if (n == NEVENTS) {
 #if LOOP
     delay(100);
     reset();
@@ -78,8 +71,7 @@ void loop()
   unsigned long now = micros();
   unsigned long elapsed = now - last_state_changed;
 
-  if (elapsed >= state_duration)
-  {
+  if (elapsed >= state_duration) {
     state = !state;
     last_state_changed = now;
     state_duration = timestamps[n + 1] - timestamps[n];
