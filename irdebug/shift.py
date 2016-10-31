@@ -7,7 +7,7 @@ def toZero(sigs):
     def __lambda(sig):
         return sig - np.array([sig[0,0], 0])
 
-    return util.mapSignals(sigs, __lambda)
+    return util.unpack(util.mapSignals(sigs, __lambda))
 
 def byOffset(sigs, offset):
     """Shift signal along time axis so that first event happens at zero."""
@@ -15,5 +15,5 @@ def byOffset(sigs, offset):
     def __lambda(sig, offset):
         return sig + np.array([offset, 0])
 
-    return util.mapSignals(sigs, __lambda, offset)
+    return util.unpack(util.mapSignals(sigs, __lambda, offset))
     

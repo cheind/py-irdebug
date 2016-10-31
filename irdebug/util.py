@@ -23,10 +23,11 @@ def mapSignals(x, fnc, *fnc_args, **fnc_kwargs):
             return fnc(x)
 
     if isSignal(x):
-        return invoke(x, fnc, *fnc_args, **fnc_kwargs)
+        return [invoke(x, fnc, *fnc_args, **fnc_kwargs)]
     elif isListOfSignals(x):
         return [invoke(s, fnc, *fnc_args, **fnc_kwargs) for s in x]
     else:
         raise TypeError("Signal input must be array-like or array of array-like.")
 
-    
+def unpack(x):
+    return x if len(x) > 1 else x[0]

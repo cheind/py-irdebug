@@ -15,4 +15,4 @@ def firstOrder(sigs):
     def __firstOrder(sig):
         return np.diff(sig, axis=0)
 
-    return util.mapSignals(sigs, __firstOrder)
+    return util.unpack(util.mapSignals(sigs, __firstOrder))

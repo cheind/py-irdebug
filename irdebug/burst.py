@@ -30,4 +30,4 @@ def detect(sigs, th=15):
         
         return [sig[np.where(labels==id)[0]] for id in range(0, nbursts)]
 
-    return util.mapSignals(sigs, __lambda, th)
+    return util.unpack(util.mapSignals(sigs, __lambda, th))
