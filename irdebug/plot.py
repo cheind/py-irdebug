@@ -1,10 +1,11 @@
 
 import numpy as np
-import matplotlib.pyplot as pyplot
 
 from . import util
 
 def plot(sigs, plt=None):
+    import matplotlib.pyplot as pyplot
+    
     if not plt:
         plt = pyplot
 
