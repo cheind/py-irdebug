@@ -1,37 +1,43 @@
 import numpy as np
-from scipy import interpolate
 from functools import reduce
 import math
 
 from . import util
 
-def uniform(sigs):
+def sampleUniform(sigs, start_zero=True):
 
     step = None
     def __gcd(sig):
         return reduce(lambda x,y: math.gcd(x,y), sig[:,0])
 
     step = reduce(lambda x,y: math.gcd(x,y), util.mapSignals(sigs, __gcd))
-    print(step)
 
     def __lambda(sig, step):
 
-        f = interpolate.interp1d(sig[:,0], sig[:,1], kind='zero', assume_sorted=True)
-
         t = np.array([], dtype=int)
         y = np.array([], dtype=int)
-        for i in range(0, sig.shape[0]-1):
-            ts = np.arange(sig[i,0], sig[i+1,0], step, dtype=int)
-            ys = f(ts).astype(int)
+
+        first = -1 if start_zero else 0
+        for i in range(first, sig.shape[0]-1):
+            ts,ys = None, None
+            if i == -1:
+                # Sample from zero to first
+                ts = np.arange(0, sig[0,0], step, dtype=int)
+                ys = np.full(ts.shape, (sig[0,1] + 1) % 2, dtype=int)
+            else:
+                # Sample between two events
+                ts = np.arange(sig[i,0], sig[i+1,0], step, dtype=int)
+                ys = np.full(ts.shape, sig[i,1], dtype=int)
             t = np.concatenate((t, ts), axis=0)
             y = np.concatenate((y, ys), axis=0)
-        # Add last row (not interpolated)    
-        m = np.column_stack((t, y))    
+
+        m = np.column_stack((t, y))   
+        # Add last row (not interpolated)   
         return np.vstack((m, sig[-1,:]))      
 
     return util.unpack(util.mapSignals(sigs, __lambda, step))
 
-def sparse(sigs):
+def sampleSparse(sigs):
 
     def __lambda(sig):
         # Compare every element to its neighbor and add 1 to correct index

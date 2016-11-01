@@ -4,15 +4,15 @@ import numpy as np
 from . import diff
 from . import util
 
-def detect(sigs, th=15):
+def findBursts(sigs, th=15):
     """Automatic detection of signal bursts in signals.
     This method clusters bursts and splits at longer signal pauses. The threshold for
     burst vs. pause is the median of all event intervals times some user specified multiplicative
     factor. 
     """
         
-    def __lambda(sig, th):
-        d = diff.firstOrder(sig)
+    def _lambda(sig, th):
+        d = diff.diff(sig)
 
         # Use a multiplicative of the median to separate bursts in signal
         m = np.median(d[:,0])
@@ -30,4 +30,4 @@ def detect(sigs, th=15):
         
         return [sig[np.where(labels==id)[0]] for id in range(0, nbursts)]
 
-    return util.unpack(util.mapSignals(sigs, __lambda, th))
+    return util.unpack(util.mapSignals(sigs, _lambda, th))
