@@ -2,7 +2,7 @@ import numpy as np
 from functools import reduce
 import math
 
-from . import util
+from .util import *
 
 def sampleUniform(sigs, ignore_offset=False):
 
@@ -10,7 +10,7 @@ def sampleUniform(sigs, ignore_offset=False):
     def __gcd(sig):
         return reduce(lambda x,y: math.gcd(x,y), sig[:,0])
 
-    step = reduce(lambda x,y: math.gcd(x,y), util.mapSignals(sigs, __gcd))
+    step = reduce(lambda x,y: math.gcd(x,y), mapSignals(sigs, __gcd))
 
     def __lambda(sig, step):
 
@@ -35,7 +35,7 @@ def sampleUniform(sigs, ignore_offset=False):
         # Add last row (not interpolated)   
         return np.vstack((m, sig[-1,:]))      
 
-    return util.unpack(util.mapSignals(sigs, __lambda, step))
+    return unpack(mapSignals(sigs, __lambda, step))
 
 def sampleSparse(sigs, ignore_offset=False, return_index=False):
 
@@ -48,4 +48,7 @@ def sampleSparse(sigs, ignore_offset=False, return_index=False):
         return (e, ids) if return_index else e
 
 
-    return util.unpack(util.mapSignals(sigs, __lambda))
+    return unpack(mapSignals(sigs, __lambda))
+
+def sampleFrequency(sigs, unit=1e6):
+    return unpack(mapSignals(sigs, lambda sig: (time(sig)[1] - time(sig)[0])*unit))

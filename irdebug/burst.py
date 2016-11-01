@@ -26,6 +26,8 @@ def findBursts(sigs, th=15, ignore_offset=False):
         # map back to input signal ids
         cids = ids[sids + 1]
 
+        # Issue here: when sigs is already densly sampled we have a lot of trailing 
+        # elements that shouldn't be there
         return np.array_split(sig, cids)
 
     return util.unpack(util.mapSignals(sigs, _lambda))

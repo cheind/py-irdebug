@@ -31,3 +31,9 @@ def mapSignals(x, fnc, *fnc_args, **fnc_kwargs):
 
 def unpack(x):
     return x if len(x) > 1 else x[0]
+
+def time(sigs):
+    return unpack(mapSignals(sigs, lambda sig: sig[:,0]))
+
+def state(sigs):
+    return unpack(mapSignals(sigs, lambda sig: sig[:,1]))
