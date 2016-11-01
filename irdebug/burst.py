@@ -3,6 +3,7 @@ import numpy as np
 
 from . import diff
 from . import util
+from . import sample
 
 def findBursts(sigs, th=15):
     """Automatic detection of signal bursts in signals.
@@ -12,22 +13,19 @@ def findBursts(sigs, th=15):
     """
         
     def _lambda(sig, th):
-        d = diff.diff(sig)
+        sparse, ids = sample.sampleSparse(sig, event_on_first=True, return_index=True)
 
-        # Use a multiplicative of the median to separate bursts in signal
+        # Use a multiplicative of median event arrival times to separate bursts in signal
+        d = diff.diff(sparse)
         m = np.median(d[:,0])
         th = m * th
 
-        labels = np.empty(sig.shape[0], dtype=np.int32)
-        label = 0
-        labels[0] = label
-        for i in range(0, len(d)):
-            if d[i,0] > th:
-                label += 1                    
-            labels[i + 1] = label
-            
-        nbursts = len(np.unique(labels))
-        
-        return [sig[np.where(labels==id)[0]] for id in range(0, nbursts)]
+        # classify
+        sids = np.where(d[:,0] > th)[0]
+
+        # map back to input signal ids
+        cids = ids[sids + 1]
+
+        return np.array_split(sig, cids)
 
     return util.unpack(util.mapSignals(sigs, _lambda, th))

@@ -37,12 +37,15 @@ def sampleUniform(sigs, start_zero=True):
 
     return util.unpack(util.mapSignals(sigs, __lambda, step))
 
-def sampleSparse(sigs):
+def sampleSparse(sigs, event_on_first=True, return_index=False):
 
     def __lambda(sig):
         # Compare every element to its neighbor and add 1 to correct index
         ids = np.where(sig[:-1, 1] != sig[1:,1])[0] + 1
-        return np.vstack((sig[0,:], sig[ids, :]))
+        if event_on_first:
+            ids = np.insert(ids, 0, 0)
+        e = sig[ids, :]
+        return (e, ids) if return_index else e
 
 
     return util.unpack(util.mapSignals(sigs, __lambda))
