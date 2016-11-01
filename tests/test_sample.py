@@ -7,7 +7,7 @@ def test_uniform():
         [10,0],[20,1],[25,0]
     ])
 
-    su = ir.sampleUniform(s, start_zero=True)
+    su = ir.sampleUniform(s, ignore_offset=False)
     np.testing.assert_allclose(su, np.array([
         [0, 1],
         [5, 1],
@@ -17,7 +17,7 @@ def test_uniform():
         [25, 0]
     ]))
 
-    su = ir.sampleUniform(s, start_zero=False)
+    su = ir.sampleUniform(s, ignore_offset=True)
     np.testing.assert_allclose(su, np.array([
         [10, 0],
         [15, 0],

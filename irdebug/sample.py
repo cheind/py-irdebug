@@ -4,7 +4,7 @@ import math
 
 from . import util
 
-def sampleUniform(sigs, start_zero=True):
+def sampleUniform(sigs, ignore_offset=False):
 
     step = None
     def __gcd(sig):
@@ -17,7 +17,7 @@ def sampleUniform(sigs, start_zero=True):
         t = np.array([], dtype=int)
         y = np.array([], dtype=int)
 
-        first = -1 if start_zero else 0
+        first = 0 if ignore_offset else -1
         for i in range(first, sig.shape[0]-1):
             ts,ys = None, None
             if i == -1:
@@ -37,12 +37,12 @@ def sampleUniform(sigs, start_zero=True):
 
     return util.unpack(util.mapSignals(sigs, __lambda, step))
 
-def sampleSparse(sigs, event_on_first=True, return_index=False):
+def sampleSparse(sigs, ignore_offset=False, return_index=False):
 
     def __lambda(sig):
         # Compare every element to its neighbor and add 1 to correct index
         ids = np.where(sig[:-1, 1] != sig[1:,1])[0] + 1
-        if event_on_first:
+        if not ignore_offset:
             ids = np.insert(ids, 0, 0)
         e = sig[ids, :]
         return (e, ids) if return_index else e
