@@ -21,6 +21,9 @@ def test_findBurstsDense():
 
     b = ir.findBursts(ss)
 
+    print(aburst)
+    print(b[0])
+
     assert len(b) == 3
 
     bz = ir.shiftZero(ir.sampleSparse(b))

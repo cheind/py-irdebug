@@ -2,7 +2,7 @@
 import numpy as np
 
 from . import diff
-from . import util
+from .util import time, state
 from . import sample
 
 def findBursts(sigs, th=15, ignore_offset=False):
@@ -13,12 +13,28 @@ def findBursts(sigs, th=15, ignore_offset=False):
     """
         
     def _lambda(sig):
+
+        # Create first order differential
+        d = diff.diff(sig)
+
+        # Get all non zero state ids (events)
+        ids = np.where(state(d) != 0)[0] + 1
+
+        # Compute time diffs between all events
+        t = np.diff(time(sig)[ids])
+
+        # Compute threshold
+        m = np.median(t)
+        myth = m * th
+
+        for i in range(0, len(t)):
+
+
         sparse, ids = sample.sampleSparse(sig, ignore_offset, return_index=True)
 
         # Use a multiplicative of median event arrival times to separate bursts in signal
         d = diff.diff(sparse)
-        m = np.median(d[:,0])
-        myth = m * th
+
 
         # classify
         sids = np.where(d[:,0] > myth)[0]
