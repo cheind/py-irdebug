@@ -2,10 +2,10 @@
 import numpy as np
 
 from . import diff
-from .util import time, state
+from .util import time, state, unpack, mapSignals
 from . import sample
 
-def findBursts(sigs, th=15, ignore_offset=False):
+def findBursts(sigs, th=15):
     """Automatic detection of signal bursts in signals.
     This method clusters bursts and splits at longer signal pauses. The threshold for
     burst vs. pause is the median of all event intervals times some user specified multiplicative
@@ -14,36 +14,32 @@ def findBursts(sigs, th=15, ignore_offset=False):
         
     def _lambda(sig):
 
-        # Create first order differential
-        d = diff.diff(sig)
+        # Create first order differential      
+        d = np.diff(state(sig))
 
         # Get all non zero state ids (events)
-        ids = np.where(state(d) != 0)[0] + 1
+        eids = np.where(d != 0)[0] + 1
+        eids = np.hstack(([0], eids)) # Add artificial event at zero
 
-        # Compute time diffs between all events
-        t = np.diff(time(sig)[ids])
-
-        # Compute threshold
-        m = np.median(t)
+        # Compute threshold based on time diffs between events
+        dte = np.diff(time(sig)[eids])
+        m = np.median(dte)
         myth = m * th
+     
+        # Add dummy elements to end of list to ensure correct bounds
+        eids = np.hstack((eids, [eids[-1]+1]))
+        dte = np.hstack((dte, [myth + 1]))
+        copy_from = eids[0] if len(eids) > 0 else 0
 
-        for i in range(0, len(t)):
+        b = []
+        for i in range(0, len(eids) - 1):
+            e0 = eids[i]
+            e1 = eids[i+1]            
+            if dte[i] > myth:
+                if e0 > 0:
+                    b.append(sig[copy_from:e0+1])
+                copy_from = e1
 
+        return b
 
-        sparse, ids = sample.sampleSparse(sig, ignore_offset, return_index=True)
-
-        # Use a multiplicative of median event arrival times to separate bursts in signal
-        d = diff.diff(sparse)
-
-
-        # classify
-        sids = np.where(d[:,0] > myth)[0]
-
-        # map back to input signal ids
-        cids = ids[sids + 1]
-
-        # Issue here: when sigs is already densly sampled we have a lot of trailing 
-        # elements that shouldn't be there
-        return np.array_split(sig, cids)
-
-    return util.unpack(util.mapSignals(sigs, _lambda))
+    return unpack(mapSignals(sigs, _lambda))
